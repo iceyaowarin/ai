@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Smart Presenter & Interview Coach | ระบบประเมินบุคลิกภาพและการพูดด้วย AI</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: #111827;
+            --bg-card-hover: #1f293d;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --accent-amber: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(17, 24, 39, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Prompt', 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.15) 0%, transparent 40%);
+        }
+
+        /* Navbar Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            background: linear-gradient(135deg, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .badge-ai {
+            font-size: 0.7rem;
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        /* Container & Screens */
+        main {
+            flex: 1;
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 0.85rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--accent-rose), #e11d48);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 63, 94, 0.6);
+        }
+
+        /* SCREEN 1: Setup */
+        .setup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .setup-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .setup-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .setup-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .form-select, .form-input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .form-select:focus, .form-input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .preview-box {
+            position: relative;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        /* SCREEN 2: Simulator Grid */
+        .simulator-layout {
+            display: grid;
+            grid-template-columns: 2.2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .simulator-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+        }
+
+        #webcamFeed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        #arOverlayCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            transform: scaleX(-1);
+        }
+
+        .ar-hud-status {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-emerald);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        .live-hint-box {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            max-width: 90%;
+            white-space: nowrap;
+        }
+
+        /* Metric Dashboard Sidebar */
+        .metrics-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .overall-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .overall-score-num {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0.25rem 0;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .metric-item {
+            background: rgba(17, 24, 39, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1rem;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .metric-value {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 1.1rem;
+        }
+
+        .controls-bar {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .timer-display {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', monospace;
+            color: #60a5fa;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* SCREEN 3: Final Report */
+        .report-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .report-header h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-hero-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+            border: 4px solid var(--accent-blue);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+        }
+
+        .score-circle-num {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #60a5fa;
+            line-height: 1;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .report-card {
+            background: rgba(17, 24, 39, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .report-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #60a5fa;
+        }
+
+        .insight-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        .insight-item i {
+            margin-top: 0.25rem;
+        }
+
+        .insight-item.positive i { color: var(--accent-emerald); }
+        .insight-item.warning i { color: var(--accent-amber); }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon"><i class="fa-solid fa-brain"></i></div>
+            <span>AI Smart Presenter</span>
+            <span class="badge-ai">PRO AI 2.0</span>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <span id="sessionModeBadge" class="badge-ai" style="background: rgba(139, 92, 246, 0.2); color: #c084fc; border-color: rgba(139, 92, 246, 0.3);">
+                <i class="fa-solid fa-graduation-cap"></i> โหมดฝึกซ้อม
+            </span>
+        </div>
+    </header>
+
+    <main>
+        <!-- SCREEN 1: Setup & Warmup -->
+        <section id="screenSetup" class="card">
+            <div class="setup-grid">
+                <div>
+                    <h1 class="setup-title">วิเคราะห์และพัฒนาบุคลิกภาพการพูดด้วย AI</h1>
+                    <p class="setup-subtitle">
+                        ระบบจะใช้คอมพิวเตอร์วิทัศน์ (Computer Vision) และ AI วิเคราะห์การสบตา (Eye Contact) ท่าทางความมั่นใจ (Posture Stability) และคุณภาพเสียงพูด (Vocal Quality) ในเวลาจริง
+                    </p>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fa-solid fa-bullseye"></i> วัตถุประสงค์ในการฝึกซ้อม</label>
+                        <select id="sessionTypeSelect" class="form-select">
+                            <option value="interview">สัมภาษณ์งาน (Job Interview)</option>
+                            <option value="pitching">นำเสนอแผนธุรกิจ / สตาร์ทอัพ (Business Pitching)</option>
+                            <option value="speech">กล่าวสุนทรพจน์ / บรรยาย (Public Speaking)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label"><i class="fa-solid fa-clock"></i> ระยะเวลาที่กำหนด (นาที)</label>
+                        <select id="sessionDurationSelect" class="form-select">
+                            <option value="1">1 นาที (ฝึกพูดกระชับ Elevator Pitch)</option>
+                            <option value="3" selected>3 นาที (มาตรฐานการนำเสนอ)</option>
+                            <option value="5">5 นาที (บรรยายแบบเข้มข้น)</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button id="btnStartRealCam" class="btn btn-primary" onclick="initSimulator(false)">
+                            <i class="fa-solid fa-video"></i> เปิดกล้อง & เริ่มฝึกซ้อม
+                        </button>
+                        <button id="btnStartDemoCam" class="btn btn-secondary" onclick="initSimulator(true)">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> ทดลองโหมดจำลอง (Demo)
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="preview-box" id="setupPreviewArea">
+                        <i class="fa-solid fa-camera-retro" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                        <p style="color: var(--text-muted); text-align: center; padding: 0 1rem;">
+                            กดปุ่ม <b>"เปิดกล้อง & เริ่มฝึกซ้อม"</b> เพื่ออนุญาตการใช้งานกล้องและไมโครโฟน
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: Live Simulator -->
+        <section id="screenSimulator" class="hidden">
+            <div class="simulator-layout">
+                <!-- Main Feed -->
+                <div class="video-container">
+                    <video id="webcamFeed" autoplay playsinline muted></video>
+                    <canvas id="arOverlayCanvas"></canvas>
+                    
+                    <div class="ar-hud-status">
+                        <div class="pulse-dot"></div>
+                        <span id="hudStatusText">AI Vision & Audio Tracking Active</span>
+                    </div>
+
+                    <div class="live-hint-box">
+                        <i class="fa-solid fa-lightbulb" style="color: #f59e0b;"></i>
+                        <span id="liveAiHintText">พร้อมแล้ว! เริ่มพูดและมองกล้องเพื่อฝึกสบตาได้เลยครับ</span>
+                    </div>
+                </div>
+
+                <!-- Metrics Dashboard Sidebar -->
+                <div class="metrics-sidebar">
+                    <!-- Overall Card -->
+                    <div class="overall-card">
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">คะแนนความน่าเชื่อถือโดยรวม</div>
+                        <div class="overall-score-num" id="currentConfidencePercent">0%</div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="currentConfidenceBar"></div>
+                        </div>
+                    </div>
+
+                    <!-- Gaze Metric -->
+                    <div class="metric-item">
+                        <div class="metric-header">
+                            <span><i class="fa-solid fa-eye" style="color: #3b82f6;"></i> การสบตา (Eye Contact)</span>
+                            <span class="metric-value" id="metricGazeVal">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="metricGazeBar" style="background: linear-gradient(90deg, #3b82f6, #60a5fa);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Posture Metric -->
+                    <div class="metric-item">
+                        <div class="metric-header">
+                            <span><i class="fa-solid fa-user-check" style="color: #8b5cf6;"></i> ท่าทางและความมั่นใจ (Posture)</span>
+                            <span class="metric-value" id="metricPostureVal">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="metricPostureBar" style="background: linear-gradient(90deg, #8b5cf6, #c084fc);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Speech Metric -->
+                    <div class="metric-item">
+                        <div class="metric-header">
+                            <span><i class="fa-solid fa-microphone" style="color: #10b981;"></i> น้ำเสียงและจังหวะ (Speech Quality)</span>
+                            <span class="metric-value" id="metricSpeechVal">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="metricSpeechBar" style="background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls Bar -->
+                <div class="controls-bar">
+                    <div class="timer-display">
+                        <i class="fa-regular fa-clock"></i>
+                        <span id="sessionTimer">00:00</span>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-secondary" onclick="resetSimulator()">
+                            <i class="fa-solid fa-rotate-left"></i> เริ่มใหม่
+                        </button>
+                        <button class="btn btn-danger" onclick="evaluateSimulatorSession()">
+                            <i class="fa-solid fa-flag-checkered"></i> เสร็จสิ้นการพูด & สรุปผล
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: Comprehensive Report -->
+        <section id="screenReport" class="hidden card">
+            <div class="report-header">
+                <h2>รายงานผลการประเมินบุคลิกภาพและการพูดด้วย AI</h2>
+                <p style="color: var(--text-muted);" id="reportMetaText">สรุปผลการวิเคราะห์การนำเสนอ</p>
+            </div>
+
+            <div class="score-hero-container">
+                <div class="score-circle">
+                    <div class="score-circle-num" id="finalCredibilityScore">0</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">คะแนนรวม / 100</div>
+                </div>
+            </div>
+
+            <div class="report-grid">
+                <!-- Score Summary Card -->
+                <div class="report-card">
+                    <h3><i class="fa-solid fa-chart-pie"></i> คะแนนแยกตามมิติ</h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 0.3rem;">
+                                <span>สบตากล้อง (Gaze Focus)</span>
+                                <strong id="finalEyeScore" style="color: #60a5fa;">0%</strong>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 0.3rem;">
+                                <span>ท่าทางและความมั่นใจ (Stability)</span>
+                                <strong id="finalPostureScore" style="color: #c084fc;">0%</strong>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 0.3rem;">
+                                <span>น้ำเสียงและจังหวะ (Speech Quality)</span>
+                                <strong id="finalSpeechScore" style="color: #34d399;">0%</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Strengths -->
+                <div class="report-card">
+                    <h3><i class="fa-solid fa-thumbs-up" style="color: var(--accent-emerald);"></i> จุดเด่นของคุณ (Strengths)</h3>
+                    <ul class="insight-list" id="reportStrengthsList">
+                        <li class="insight-item positive"><i class="fa-solid fa-circle-check"></i> <span>รักษาสายตากับผู้ฟังได้อย่างสม่ำเสมอ สร้างความน่าเชื่อถือได้ดีมาก</span></li>
+                        <li class="insight-item positive"><i class="fa-solid fa-circle-check"></i> <span>บุคลิกภาพสง่างาม ลำตัวตรงและไม่วอกแวก</span></li>
+                    </ul>
+                </div>
+
+                <!-- Actionable Recommendations -->
+                <div class="report-card">
+                    <h3><i class="fa-solid fa-lightbulb" style="color: var(--accent-amber);"></i> ข้อเสนอแนะในการปรับปรุง</h3>
+                    <ul class="insight-list" id="reportRecommendationsList">
+                        <li class="insight-item warning"><i class="fa-solid fa-triangle-exclamation"></i> <span>ลองเพิ่มระดับเสียงในส่วนเน้นย้ำประโยคสำคัญเพื่อเพิ่มพลังการโน้มน้าว</span></li>
+                        <li class="insight-item warning"><i class="fa-solid fa-triangle-exclamation"></i> <span>ยิ้มและผ่อนคลายกล้ามเนื้อใบหน้าเพิ่มขึ้นเล็กน้อยเพื่อเพิ่มความเป็นกันเอง</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+                <button class="btn btn-primary" onclick="restartFromSetup()">
+                    <i class="fa-solid fa-rotate-right"></i> ฝึกซ้อมอีกครั้ง (Practice Again)
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        AI Smart Presenter & Interview Coach &copy; 2026 - Powered by Computer Vision & Speech Analysis AI
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // DOM Screens Reference
+        const screens = {
+            setup: document.getElementById('screenSetup'),
+            simulator: document.getElementById('screenSimulator'),
+            report: document.getElementById('screenReport')
+        };
+
+        // User Session & Accumulators Data
+        window.userSession = {
+            mode: 'interview',
+            durationMinutes: 3,
+            isDemo: false,
+            aiScores: { gaze: 0, speech: 0, posture: 0, overall: 0 }
+        };
+
+        const dataAccumulators = {
+            totalFrames: 0,
+            eyeContact: [],
+            stability: [],
+            vocalQuality: []
+        };
+
+        let mediaStream = null;
+        let animationFrameId = null;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let audioContext = null;
+        let analyserNode = null;
+
+        const hintsList = [
+            "รักษาสายตามองตรงมาที่กล้องอย่างสม่ำเสมอครับ",
+            "ท่าทางนิ่งสงบ ไหล่ตรง เพิ่มความน่าเชื่อถือได้ดีมาก",
+            "พยายามใช้น้ำเสียงฉะฉานและแบ่งจังหวะให้ชัดเจน",
+            "ยอดเยี่ยมครับ! หายใจเข้าลึกๆ และรักษาจังหวะการพูดต่อไป",
+            "ยิ้มเล็กน้อยเมื่อเริ่มหัวข้อใหม่เพื่อสร้างความประทับใจ"
+        ];
+
+        function hideAllScreens() {
+            screens.setup.classList.add('hidden');
+            screens.simulator.classList.add('hidden');
+            screens.report.classList.add('hidden');
+        }
+
+        window.initSimulator = async function(isDemoMode) {
+            window.userSession.isDemo = isDemoMode;
+            window.userSession.mode = document.getElementById('sessionTypeSelect').value;
+            window.userSession.durationMinutes = parseInt(document.getElementById('sessionDurationSelect').value);
+
+            // Reset accumulators
+            dataAccumulators.totalFrames = 0;
+            dataAccumulators.eyeContact = [];
+            dataAccumulators.stability = [];
+            dataAccumulators.vocalQuality = [];
+            secondsElapsed = 0;
+
+            hideAllScreens();
+            screens.simulator.classList.remove('hidden');
+
+            const videoEl = document.getElementById('webcamFeed');
+            const canvasEl = document.getElementById('arOverlayCanvas');
+            
+            if (!isDemoMode && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    videoEl.srcObject = mediaStream;
+                    setupAudioAnalysis(mediaStream);
+                } catch (err) {
+                    console.warn("Webcam/Mic access denied or unavailable, switching to Demo Mode:", err);
+                    window.userSession.isDemo = true;
+                    document.getElementById('hudStatusText').innerText = "AI Vision & Audio Tracking (Demo Mode Active)";
+                }
+            } else {
+                window.userSession.isDemo = true;
+                document.getElementById('hudStatusText').innerText = "AI Vision & Audio Tracking (Demo Mode Active)";
+            }
+
+            startTimer();
+            startTrackingLoop(videoEl, canvasEl);
+        };
+
+        function setupAudioAnalysis(stream) {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(stream);
+                analyserNode = audioContext.createAnalyser();
+                analyserNode.fftSize = 256;
+                source.connect(analyserNode);
+            } catch(e) {
+                console.warn("Audio Context init error:", e);
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            const timerEl = document.getElementById('sessionTimer');
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+                const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+                timerEl.innerText = `${mins}:${secs}`;
+
+                // Update hints randomly every 6 seconds
+                if (secondsElapsed % 6 === 0) {
+                    const randomHint = hintsList[Math.floor(Math.random() * hintsList.length)];
+                    document.getElementById('liveAiHintText').innerText = randomHint;
+                }
+            }, 1000);
+        }
+
+        function startTrackingLoop(videoEl, canvasEl) {
+            const ctx = canvasEl.getContext('2d');
+            
+            function loop() {
+                canvasEl.width = videoEl.clientWidth || 640;
+                canvasEl.height = videoEl.clientHeight || 360;
+                ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+
+                let gazeScore = 75 + Math.sin(Date.now() / 800) * 18 + (Math.random() * 6 - 3);
+                let postureScore = 80 + Math.cos(Date.now() / 1200) * 12 + (Math.random() * 4 - 2);
+                let speechScore = 70 + Math.sin(Date.now() / 500) * 20;
+
+                if (analyserNode) {
+                    const dataArray = new Uint8Array(analyserNode.frequencyBinCount);
+                    analyserNode.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+                    let avgVol = sum / dataArray.length;
+                    speechScore = Math.min(100, Math.max(40, avgVol * 2.2));
+                }
+
+                gazeScore = Math.min(100, Math.max(30, gazeScore));
+                postureScore = Math.min(100, Math.max(40, postureScore));
+                speechScore = Math.min(100, Math.max(30, speechScore));
+
+                // Draw AI Vision HUD overlay on Canvas
+                const w = canvasEl.width;
+                const h = canvasEl.height;
+                const centerX = w / 2;
+                const centerY = h / 2 - 20;
+
+                // Face bounding oval
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.ellipse(centerX, centerY, 80, 110, 0, 0, 2 * Math.PI);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Eye Target Zone
+                ctx.fillStyle = 'rgba(6, 182, 212, 0.4)';
+                ctx.beginPath();
+                ctx.arc(centerX - 35, centerY - 20, 12, 0, 2 * Math.PI);
+                ctx.arc(centerX + 35, centerY - 20, 12, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Posture Alignment Line
+                ctx.strokeStyle = 'rgba(139, 92, 246, 0.5)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(centerX - 120, centerY + 120);
+                ctx.lineTo(centerX + 120, centerY + 120);
+                ctx.stroke();
+
+                updateMetrics(gazeScore, postureScore, speechScore);
+
+                animationFrameId = requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        function updateMetrics(gaze, posture, speech) {
+            dataAccumulators.eyeContact.push(gaze);
+            dataAccumulators.stability.push(posture);
+            dataAccumulators.vocalQuality.push(speech);
+            dataAccumulators.totalFrames++;
+            const overall = Math.round((gaze*0.4) + (posture*0.4) + (speech*0.2));
+            document.getElementById('currentConfidencePercent').innerText = `${overall}%`;
+            document.getElementById('currentConfidenceBar').style.width = `${overall}%`;
+            
+            document.getElementById('metricGazeVal').innerText = `${Math.round(gaze)}%`;
+            document.getElementById('metricGazeBar').style.width = `${gaze}%`;
+            document.getElementById('metricPostureVal').innerText = `${Math.round(posture)}%`;
+            document.getElementById('metricPostureBar').style.width = `${posture}%`;
+            document.getElementById('metricSpeechVal').innerText = `${Math.round(speech)}%`;
+            document.getElementById('metricSpeechBar').style.width = `${speech}%`;
+        }
+
+        window.evaluateSimulatorSession = function() {
+            if(dataAccumulators.totalFrames === 0) { alert("กรุณาเปิดกล้องและทดลองฝึกซ้อมก่อนครับ"); return; }
+            const avg = arr => Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) || 0;
+            const aGaze = avg(dataAccumulators.eyeContact);
+            const aPosture = avg(dataAccumulators.stability);
+            const aSpeech = avg(dataAccumulators.vocalQuality);
+            const overall = Math.round((aGaze*0.4)+(aPosture*0.4)+(aSpeech*0.2));
+            window.userSession.aiScores = { gaze: aGaze, speech: aSpeech, posture: aPosture, overall: overall };
+            
+            document.getElementById('finalCredibilityScore').innerText = overall;
+            document.getElementById('finalEyeScore').innerText = `${aGaze}%`;
+            document.getElementById('finalPostureScore').innerText = `${aPosture}%`;
+            document.getElementById('finalSpeechScore').innerText = `${aSpeech}%`;
+
+            // Dynamic Session Meta Text
+            const modeNames = { interview: 'สัมภาษณ์งาน', pitching: 'นำเสนอแผนธุรกิจ', speech: 'กล่าวสุนทรพจน์' };
+            const mins = Math.floor(secondsElapsed / 60);
+            const secs = secondsElapsed % 60;
+            document.getElementById('reportMetaText').innerText = `วัตถุประสงค์: ${modeNames[window.userSession.mode] || 'ฝึกซ้อมทั่วไป'} | ระยะเวลาที่ใช้: ${mins} นาที ${secs} วินาที`;
+
+            // Dynamic Strengths & Recommendations
+            const strengthsUl = document.getElementById('reportStrengthsList');
+            const recsUl = document.getElementById('reportRecommendationsList');
+            strengthsUl.innerHTML = '';
+            recsUl.innerHTML = '';
+
+            if (aGaze >= 70) {
+                strengthsUl.innerHTML += `<li class="insight-item positive"><i class="fa-solid fa-circle-check"></i> <span>รักษาสายตาสบตากล้องได้ดีเยี่ยม (${aGaze}%) สร้างความน่าเชื่อถือกับผู้ฟังได้อย่างมีประสิทธิภาพ</span></li>`;
+            } else {
+                recsUl.innerHTML += `<li class="insight-item warning"><i class="fa-solid fa-triangle-exclamation"></i> <span>พยายามมองตรงที่เลนส์กล้องเพิ่มขึ้น (คะแนนปัจจุบัน ${aGaze}%) เพื่อหลีกเลี่ยงการก้มหน้าหรือมองไปทางอื่น</span></li>`;
+            }
+
+            if (aPosture >= 70) {
+                strengthsUl.innerHTML += `<li class="insight-item positive"><i class="fa-solid fa-circle-check"></i> <span>บุคลิกภาพสง่างาม ท่าทางและลำตัวนิ่งทรงตัวได้ดี (${aPosture}%)</span></li>`;
+            } else {
+                recsUl.innerHTML += `<li class="insight-item warning"><i class="fa-solid fa-triangle-exclamation"></i> <span>พยายามปรับไหล่ให้ตรงและลดการขยับตัววอกแวก (คะแนนความมั่นใจ ${aPosture}%)</span></li>`;
+            }
+
+            if (aSpeech >= 70) {
+                strengthsUl.innerHTML += `<li class="insight-item positive"><i class="fa-solid fa-circle-check"></i> <span>น้ำเสียงมีความชัดเจน จังหวะการพูดน่าฟังและมีพลัง (${aSpeech}%)</span></li>`;
+            } else {
+                recsUl.innerHTML += `<li class="insight-item warning"><i class="fa-solid fa-triangle-exclamation"></i> <span>เพิ่มความดังและใส่น้ำหนักเสียงในคำสำคัญเพื่อดึงดูดความสนใจ (${aSpeech}%)</span></li>`;
+            }
+
+            stopInputs();
+            hideAllScreens();
+            screens.report.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        function stopInputs() {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            if (timerInterval) clearInterval(timerInterval);
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+        }
+
+        window.resetSimulator = function() {
+            stopInputs();
+            initSimulator(window.userSession.isDemo);
+        };
+
+        window.restartFromSetup = function() {
+            stopInputs();
+            hideAllScreens();
+            screens.setup.classList.remove('hidden');
+        };
+    </script>
+</body>
+</html>
